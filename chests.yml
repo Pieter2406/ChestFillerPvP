@@ -1,0 +1,3 @@
+#This file holds all the chests that are linked to an autorefil configfile.
+
+default: defaultconfig.yml

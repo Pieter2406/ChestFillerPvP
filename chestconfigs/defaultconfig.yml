@@ -1,0 +1,10 @@
+#Default config for chests
+#min_players: the minimum amount of players on the server for the plugin to start.
+#refilltime: the time for the chest to refill.
+#items: the itemset predefined in items.yml. This items will be used to refill the chest.
+#amount: the maximum amount of items from the list, stored in the chest.
+
+min_players: 10
+refilltime: 3600
+items: default_itemset
+amount: 5

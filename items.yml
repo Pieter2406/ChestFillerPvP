@@ -1,0 +1,50 @@
+
+#----------------------EnchantmentsList:----------------------#
+#  ARROW_DAMAGE
+#  ARROW_FIRE 
+#  ARROW_INFINITE 
+#  ARROW_KNOCKBACK 
+#  DAMAGE_ALL 
+#  DAMAGE_ARTHROPODS 
+#  DAMAGE_UNDEAD
+#  DIG_SPEED 
+#  DURABILITY 
+#  FIRE_ASPECT 
+#  KNOCKBACK 
+#  LOOT_BONUS_BLOCKS 
+#  LOOT_BONUS_MOBS
+#  OXYGEN 
+#  PROTECTION_ENVIRONMENTAL 
+#  PROTECTION_EXPLOSIONS 
+#  PROTECTION_FALL 
+#  PROTECTION_FIRE 
+#  PROTECTION_PROJECTILE 
+#  SILK_TOUCH 
+#  THORNS 
+#  WATER_WORKER 
+
+default_itemset:
+  arrowbook:
+    Material: BOW
+    Amount: 1
+    Enchants:
+    - ARROW_INFINITE:1
+    Chance: 0.1
+  flamesword:
+    Material: STONE_SWORD
+    Amount: 1
+    Enchants:
+    - DAMAGE_UNDEAD:3
+    - DURABILITY:3
+    Chance: 0.2
+  flamesupersword:
+    Material: 276
+    Amount: 1
+    Chance: 0.2
+  hat:
+    Material: DIAMOND_HELMET
+    Amount: 1
+    Chance: 0.3
+  wool:
+    Material: 35
+    Chance: 0.5
