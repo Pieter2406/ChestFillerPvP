@@ -47,4 +47,5 @@ default_itemset:
     Chance: 0.3
   wool:
     Material: 35
+    Amount: 1
     Chance: 0.5

@@ -1,4 +1,4 @@
-package com.leuvencraft.chestfillerpvp;
+package com.leuvencraft.chestfillerpvp.parser;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,12 +19,12 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @version 1.0
  *
  */
-public class CheckLayer {
+public class ParseLayer {
 	
 	
 	private boolean hasErrors;
 	
-	private ItemsChecker itemsChecker;
+	private ItemsParser itemsChecker;
 	
 	private JavaPlugin sourcePlugin;
 	
@@ -39,7 +39,7 @@ public class CheckLayer {
 	private YamlConfiguration items;
 	private YamlConfiguration chestlist;
 	
-	public CheckLayer(JavaPlugin sourcePlugin) {
+	public ParseLayer(JavaPlugin sourcePlugin) {
 		this.sourcePlugin = sourcePlugin;
 		errLog = new ArrayList<String>();
 		try {
@@ -55,7 +55,7 @@ public class CheckLayer {
 			this.addErrMsg("An error occurred during loading items.yml and chests.yml");
 		}
 		sourcePlugin.saveDefaultConfig();
-		itemsChecker = new ItemsChecker(items);
+		itemsChecker = new ItemsParser(items);
 		
 	}
 	
