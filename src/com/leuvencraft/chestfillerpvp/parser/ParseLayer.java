@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,23 +22,30 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ParseLayer {
 	
-	
+	//determine whether there were parsing errors
 	private boolean hasErrors;
 	
-	private ItemsParser itemsChecker;
+	//An itemsparser object which parses the items.yml file and holds a hashmap with the items and set
+	private ItemsParser itemsLoader;
 	
+	//The source plugin
 	private JavaPlugin sourcePlugin;
 	
+	//The error log
 	private ArrayList<String> errLog;
-
+	
+	//config files
 	private File[] chestConfigFiles;
 	private File itemsFile;
 	private File chestsFile;
 	private File defaultChestConfig;
 
+	//YamlConfigurations
 	private List<YamlConfiguration> chestConfigList;
 	private YamlConfiguration items;
 	private YamlConfiguration chestlist;
+	
+	HashMap<String,ItemSet> ItemSets;
 	
 	public ParseLayer(JavaPlugin sourcePlugin) {
 		this.sourcePlugin = sourcePlugin;
@@ -55,11 +63,16 @@ public class ParseLayer {
 			this.addErrMsg("An error occurred during loading items.yml and chests.yml");
 		}
 		sourcePlugin.saveDefaultConfig();
-		itemsChecker = new ItemsParser(items);
+		loadItems();
 		
 	}
 	
-	
+	private void loadItems(){
+		itemsLoader = new ItemsParser(items);
+		this.ItemSets = itemsLoader.getItemSets();
+		addErrMsg(itemsLoader.getItmErrLog());
+		this.itemsLoader.terminate();
+	}
 
 	/*
 	 * this copy(); method copies the specified file from your jar
@@ -115,12 +128,24 @@ public class ParseLayer {
 			}
 		}
 		
-		public void addErrMsg(String msg){
+		private void addErrMsg(String msg){
 			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			Date now = new Date();
 			String strDate = dateFormat.format(now);
 			errLog.add(errLog.size() + " :[" + strDate + "]: " + msg);
 			this.hasErrors = true;
+		}
+		private void addErrMsg(List<String> msgblock){
+			errLog.addAll(msgblock);
+			if(!errLog.isEmpty()){
+				this.hasErrors = true;
+			}
+			
+		}
+		
+		public void terminate(){
+			this.itemsLoader.terminate();
+			this.itemsLoader = null;
 		}
 		
 

@@ -20,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @version 1.0
  *
  */
-public class ChestFillerPvP extends JavaPlugin {
+public final class ChestFillerPvP extends JavaPlugin {
 	private ArrayList<String> errLog;
 
 

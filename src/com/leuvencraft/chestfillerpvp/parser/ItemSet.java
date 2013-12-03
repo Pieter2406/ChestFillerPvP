@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +30,7 @@ public class ItemSet {
 
 	private ArrayList<String> acceptableEnchants;
 	
-	private final String itemSetPath;
+	private final String itemSetName;
 
 	private List<String> setErrLog;
 	private FileConfiguration itemConfig;
@@ -43,7 +42,7 @@ public class ItemSet {
 		this.itemsInConfig = new HashSet<RndItemStack>();
 		this.setErrLog = new ArrayList<String>();
 		this.accumulatedChance = 0;
-		this.itemSetPath = setPath;
+		this.itemSetName = setPath;
 		for(Enchantment ench : Enchantment.values()){
 			acceptableEnchants.add(ench.getName());
 		}
@@ -51,8 +50,9 @@ public class ItemSet {
 	}
 
 	private void parse(){
+		
 		int ID = 0;
-		for(String itm : itemConfig.getConfigurationSection(itemSetPath).getKeys(false)){
+		for(String itm : itemConfig.getConfigurationSection(itemSetName).getKeys(false)){
 			RndItemStack rndItem;
 			Material mat;
 			double dropChance = 0;
@@ -63,14 +63,14 @@ public class ItemSet {
 			try{
 				mat = getMaterial(itm);
 			}catch(Exception ex){
-				addErrMsg(String.format("Error in the material of itemset  '%s' in item '%s'.", this.itemSetPath, itm));
+				addErrMsg(String.format("Error in the material of itemset  '%s' in item '%s'.", this.itemSetName, itm));
 				continue;
 			}
 			//Check amount in file
 			try{
 				amount = itemSetConfig().getInt(itm + ItemsParser.AMOUNT_PATH);
 			}catch(Exception ex){
-				addErrMsg(String.format("Error in the amount of itemset '%s' in itm '%s'.", this.itemSetPath,itm));
+				addErrMsg(String.format("Error in the amount of itemset '%s' in itm '%s'.", this.itemSetName,itm));
 				continue;
 			}
 			
@@ -78,22 +78,23 @@ public class ItemSet {
 			try{
 				if(hasValidEnchants(itm)){
 					List<String> enchantlist = itemSetConfig().getStringList(itm + ItemsParser.ENCHANT_PATH);
+					for(String str : enchantlist){
+						String[] enchAndLvl = str.split(":");
+						enchants.put(Enchantment.getByName(enchAndLvl[0]), Integer.parseInt(enchAndLvl[1]));
+					}
 				}
-				
-			}catch
-			
-				List<String> enchantlist = itemConfig.getStringList(itm + ItemsParser.ENCHANT_PATH);
-				for(String str : enchantlist){
-					String[] enchAndLvl = str.split(":");
-					enchants.put(Enchantment.getByName(enchAndLvl[0]), Integer.parseInt(enchAndLvl[1]));
-				}
-			}else{
-				checker.addDebug("No Amount given in item: " + itm);
-
+			}catch(Exception ex){
+				addErrMsg(String.format("Error in the enchants of itemset '%s' in itm '%s'.", this.itemSetName,itm));
+				continue;
 			}
+			
+				
 			//Check chance
-			if(checker.hasValidChance(itm)){
-				dropChance = itemConfig.getDouble(itm + ItemsParser.CHANCE_PATH);
+			try{
+				dropChance = itemSetConfig().getDouble(itm + ItemsParser.CHANCE_PATH);
+			}catch(Exception ex){
+				addErrMsg(String.format("Error in chance of itemset '%s' in itm '%s'.", this.itemSetName,itm));
+				continue;
 			}
 			//Check accumulatedChance
 			accumulatedChance += dropChance;
@@ -102,15 +103,12 @@ public class ItemSet {
 			try{
 				rndItem.addEnchantments(enchants);
 			}catch (Exception ex){
-				this.checker.addErrorMsg("Enchantment cannot be put on item!");
+				addErrMsg("Enchantment cannot be put on item!");
 				continue;
 			}
 
 			itemsInConfig.add(rndItem);
 
-			for(RndItemStack item : getItemsInConfig()){
-				getValidator().addDebug(item.toString());
-			}
 		}
 	}
 
@@ -119,20 +117,10 @@ public class ItemSet {
 	}
 	
 	private ConfigurationSection itemSetConfig(){
-		return itemConfig.getConfigurationSection(this.itemSetPath);
+		return itemConfig.getConfigurationSection(this.itemSetName);
 	}
 
-	/**
-	 * @return the itemsInConfig
-	 */
-	public Set<RndItemStack> getItemsInConfig() {
-		return itemsInConfig;
-	}
-
-
-	public double getAccumulatedChance(){
-		return this.accumulatedChance;
-	}
+	
 	
 	private void addErrMsg(String msg){
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -141,7 +129,7 @@ public class ItemSet {
 		setErrLog.add(setErrLog.size() + " :[" + strDate + "]: " + msg);
 	}
 	
-	public boolean hasValidEnchants(String itemName){
+	private boolean hasValidEnchants(String itemName){
 		if(isInYmlStructure(itemName,ItemsParser.ENCHANT_PATH)){
 			List<String> enchantlist = itemSetConfig().getStringList(itemName + ItemsParser.ENCHANT_PATH);
 			if(!enchantlist.isEmpty()){
@@ -170,6 +158,37 @@ public class ItemSet {
 		}else{
 			return false;
 		}
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @return the errorlog.
+	 */
+	public List<String> getErrLog(){
+		return this.setErrLog;
+	}
+	/**
+	 * 
+	 * @return the name of the itemset.
+	 */
+	public String itemSetName(){
+		return this.itemSetName;
+	}
+	/**
+	 * @return the itemsInConfig
+	 */
+	public Set<RndItemStack> getItemsInConfig() {
+		return itemsInConfig;
+	}
+
+	/**
+	 * 
+	 * @return the accumulated chance of the items in the set.
+	 */
+	public double getAccumulatedChance(){
+		return this.accumulatedChance;
 	}
 }
 
